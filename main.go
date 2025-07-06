@@ -142,7 +142,7 @@ func (app *RainApp) update() {
 	}
 
 	if app.showFps {
-		app.writeScreenBuf(0, 0, []byte(fmt.Sprint(app.GetTps())))
+		app.writeScreenBuf(0, 0, fmt.Appendf(nil, "%.2f", app.GetTps()))
 	}
 
 	terminal.SetCursorHome()
