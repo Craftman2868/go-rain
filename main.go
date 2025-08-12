@@ -11,9 +11,10 @@ import (
 
 const (
 	MAX_DROP_COUNT     = 2000
-	MAX_NEW_DROP_COUNT = 4
+	MAX_NEW_DROP_COUNT = 3
 	DROP_CHARS         = "||.,'`"
 	DROP_CHAR_COUNT    = int32(len(DROP_CHARS))
+	NEW_DROP_MAX_Y     = 7
 	MAX_FPS            = 24
 )
 
@@ -48,7 +49,7 @@ func (app *RainApp) on_key(ev_ event.Event) {
 
 	switch ev.Key {
 	case 'C':
-		if ev.Mod&terminal.MOD_CTRL == 0 {
+		if !ev.Ctrl() {
 			break
 		}
 		fallthrough
@@ -69,7 +70,7 @@ func (app *RainApp) randDropChar() byte {
 func (app *RainApp) newDrop() {
 	var d drop
 	d.x = uint16(rand.Int31n(int32(app.termW - 1)))
-	d.y = uint16(rand.Int31n(10))
+	d.y = uint16(rand.Int31n(int32(min(app.termH, NEW_DROP_MAX_Y))))
 	d.char = app.randDropChar()
 	d.speed = uint16(rand.Int31n(3) + 1)
 	app.drops = append(app.drops, d)
@@ -108,11 +109,6 @@ func (app *RainApp) writeScreenBuf(x, y int, data []byte) {
 func (app *RainApp) update() {
 	app.termW, app.termH = terminal.GetSize()
 	app.termH--
-
-	if app.termH < 10 {
-		app.Stop()
-		return
-	}
 
 	if len(app.screenBuf) != int(app.termW)*int(app.termH) {
 		app.initScreenBuf()
