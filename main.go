@@ -33,18 +33,14 @@ type drop struct {
 	speed uint16
 }
 
-func NewRainApp() *RainApp {
-	var ap RainApp
-
-	ap.TerminalApp = app.NewTerminalApp()
+func (ap *RainApp) InitRain() {
+	ap.TerminalApp.InitTerminal()
 
 	ap.On("key", ap.on_key)
 
 	ap.On("update", func(event.Event) {
 		ap.update()
 	})
-
-	return &ap
 }
 
 func (app *RainApp) on_key(ev_ event.Event) {
@@ -152,7 +148,9 @@ func (app *RainApp) update() {
 }
 
 func main() {
-	app := NewRainApp()
+	var app RainApp
+
+	app.InitRain()
 
 	app.Init(MAX_FPS)
 	app.Run()
